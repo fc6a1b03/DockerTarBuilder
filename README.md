@@ -22,7 +22,7 @@ https://github.com/wukongdaily/OrangePiShell
 ## 操作
 ### Pull and Save Docker Image 
 
-- unzip docker-images-tar-xxx-xxxxx.zip `压缩包不带目录，解压会将所有tar包放置当前目录中`
+- unzip docker-images-tar-xxx-xxxxx.zip `压缩包里不带目录，解压会将所有tar包放置当前目录中`
 ```sh
 docker load -i xxx.tar
 or
