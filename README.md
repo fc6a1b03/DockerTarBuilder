@@ -18,3 +18,15 @@ https://www.bilibili.com/video/BV1EZ421M7mL
 https://github.com/wukongdaily/OrangePiShell
 ## 在哪里可以搜索或查询docker镜像的详细信息
 ### [查询镜像的详细信息 点击这里直达](https://docker.fxxk.dedyn.io/)
+
+## 操作
+### Pull and Save Docker Image 
+
+- unzip docker-images-tar-xxx-xxxxx.zip `压缩包不带目录，解压会将所有tar包放置当前目录中`
+```sh
+docker load -i xxx.tar
+or
+for file in *.tar; do
+  docker load -i "$file"
+done
+```
