@@ -19,11 +19,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Update Docker to the latest version
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-ce
-
     - name: Clean up Docker to free space
       run: |
         docker system prune -a -f
@@ -43,7 +38,7 @@ jobs:
 
     - name: Generate timestamp for artifact name
       id: timestamp
-      run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+      run: echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
