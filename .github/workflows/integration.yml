@@ -33,7 +33,7 @@ jobs:
         IFS=',' read -r -a image_array <<< "$images"
         for image in "${image_array[@]}"; do
           docker pull "${image}" --platform "linux/${arch}"
-          docker save "${image}" -o "${image//\//_}-${arch}.tar"
+          docker save "${image}" -o "${image//[:\/]/_}-${arch}.tar"
         done
 
     - name: Generate timestamp for artifact name
@@ -46,9 +46,3 @@ jobs:
         name: docker-images-tar-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
         path: "*.tar"
         retention-days: 1
-
-    - name: Clean up intermediate files
-      run: |
-        rm -f *.tar
-        docker system prune -a -f
-        docker volume prune -f
