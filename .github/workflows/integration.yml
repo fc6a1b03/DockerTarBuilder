@@ -16,17 +16,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    
+    # - name: Checkout repository
+    #   uses: actions/checkout@v4
 
-    - name: Clean up Docker to free space
+    - name: Clean Docker
       run: |
         docker system prune -a -f
         docker volume prune -f
         docker builder prune -f
         docker network prune -f
 
-    - name: Pull Docker Images and Package
+    - name: Pull Docker Images and Pack
       run: |
         images="${{ github.event.inputs.docker_images }}"
         arch="${{ github.event.inputs.architecture }}"
@@ -44,5 +45,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: docker-images-tar-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
-        path: "*.tar"
+        path: "docker-images-tar-*.tar"
         retention-days: 1
+        compression-level: 9
