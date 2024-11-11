@@ -27,7 +27,7 @@ jobs:
         IFS=',' read -r -a image_array <<< "$images"
         for image in "${image_array[@]}"; do
           (docker pull "${image}" --platform "linux/${arch}" && \
-          docker save "${image}" | 7z a -mx=9 -mmt=on -ms=on -md=256m "${image//[:\/]/_}-${arch}.tar.7z") &
+          docker save "${image}" | 7z a -mx=9 -mmt=on -ms=on -md=256m "${image//[:\/]/_}-${arch}.7z") &
         done
         wait
 
@@ -39,6 +39,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: docker-images-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
-        path: docker-images-tar.7z
+        path: "*.7z"
         retention-days: 1
         compression-level: 0
