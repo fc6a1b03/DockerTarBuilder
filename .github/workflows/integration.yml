@@ -22,10 +22,11 @@ jobs:
 
     - name: Clean Docker
       run: |
-        docker system prune -a -f
-        docker volume prune -f
-        docker builder prune -f
-        docker network prune -f
+        docker system prune -a -f &
+        docker volume prune -f &
+        docker builder prune -f &
+        docker network prune -f &
+        wait
 
     - name: Pull Docker Images and Pack
       run: |
@@ -40,8 +41,8 @@ jobs:
     - name: Compress with 7z and Generate timestamp for artifact name
       id: timestamp
       run: |
-        7z a docker-images-tar.7z *.tar -mx=9
-        echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+        7z a docker-images-tar.7z *.tar -mx=9 -mmt=on -ms=on -md=256m -m0=PPMd
+        echo "timestamp=$(TZ="Asia/Shanghai" printf "%(%Y%m%d%H%M%S)T")" >> $GITHUB_ENV
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
