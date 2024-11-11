@@ -1,4 +1,4 @@
-name: Pull and Save Docker Image
+name: Pull and Pack Docker Image
 on:
   workflow_dispatch:
     inputs:
