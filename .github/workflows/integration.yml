@@ -14,33 +14,32 @@ on:
 jobs:
   pull_and_pack:
     runs-on: ubuntu-latest
-    
     steps:
 
-    # - name: Checkout repository
-    #   uses: actions/checkout@v4
+      # - name: Checkout repository
+      #   uses: actions/checkout@v4
 
-    - name: Pull Docker Images and Pack
-      env:
-        arch: ${{ github.event.inputs.architecture }}
-        images: ${{ github.event.inputs.docker_images }}
-      run: |
-        IFS=',' read -r -a image_array <<< "$images"
-        printf "%s\n" "${image_array[@]}" | xargs -P $(nproc) -I {} bash -c '
-          image="{}"
-          docker pull "$image" --platform "linux/${arch}" --quiet --disable-content-trust
-          docker save "$image" -o "${image//[:\/]/-}-${arch}.tar"
-        '
+      - name: Pull Docker Images and Pack
+        env:
+          arch: ${{ github.event.inputs.architecture }}
+          images: ${{ github.event.inputs.docker_images }}
+        run: |
+          IFS=',' read -r -a image_array <<< "$images"
+          printf "%s\n" "${image_array[@]}" | xargs -P $(nproc) -I {} bash -c '
+            image="{}"
+            docker pull "$image" --platform "linux/${arch}" --quiet --disable-content-trust
+            docker save "$image" -o "${image//[:\/]/-}-${arch}.tar"
+          '
 
-    - name: Generate timestamp for artifact name
-      id: timestamp
-      run: echo "timestamp=$(TZ="Asia/Shanghai" printf "%(%Y%m%d%H%M%S)T")" >> $GITHUB_ENV
-    
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-images-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
-        path: "*.tar"
-        retention-days: 1
-        compression-level: 0
-        if-no-files-found: error
+      - name: Generate timestamp for artifact name
+        id: timestamp
+        run: echo "timestamp=$(TZ="Asia/Shanghai" printf "%(%Y%m%d%H%M%S)T")" >> $GITHUB_ENV
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
+          path: "*.tar"
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
