@@ -14,7 +14,7 @@ on:
 jobs:
   pull_and_pack:
     runs-on: ubuntu-latest
-
+    
     steps:
 
     # - name: Checkout repository
@@ -22,11 +22,14 @@ jobs:
 
     - name: Pull Docker Images and Pack
       run: |
-        images="${{ github.event.inputs.docker_images }}"
         arch="${{ github.event.inputs.architecture }}"
+        images="${{ github.event.inputs.docker_images }}"
         IFS=',' read -r -a image_array <<< "$images"
         for image in "${image_array[@]}"; do
-          (docker pull "${image}" --platform "linux/${arch}" && docker save "${image}" -o "${image//[:\/]/-}-${arch}.tar") &
+          (
+            docker pull "${image}" --platform "linux/${arch}" --quiet && \
+            docker save "${image}" -o "${image//[:\/]/-}-${arch}.tar"
+          ) &
         done
         wait
 
