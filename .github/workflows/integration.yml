@@ -34,7 +34,7 @@ jobs:
     strategy:
       matrix:
         image: ${{ fromJson(needs.pull_and_pack.outputs.docker_images) }}
-        arch: ${{ env.architecture }}
+        arch: ${{ needs.pull_and_pack.outputs.architecture }}
     steps:
       # Step 1: Clean Docker system
       - name: Clean Docker
