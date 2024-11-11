@@ -27,7 +27,8 @@ jobs:
       run: |
         IFS=',' read -r -a image_array <<< "$images"
         printf "%s\n" "${image_array[@]}" | xargs -n 1 -P $(nproc) -I {} bash -c '
-          docker pull "{}" --platform "linux/${arch}" --quiet --disable-content-trust && \
+          image="{}"
+          docker pull "{}" --platform "linux/${arch}" --quiet --disable-content-trust
           docker save "{}" -o "${{}//[:\/]/-}-${arch}.tar"
         '
         # for image in "${image_array[@]}"; do
