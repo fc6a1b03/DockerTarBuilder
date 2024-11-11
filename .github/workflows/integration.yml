@@ -37,14 +37,11 @@ jobs:
         done
         wait
 
-    - name: Compress with 7z
-      run: |
-        sudo apt-get update && sudo apt-get install -y p7zip-full
-        7z a docker-images-tar.7z *.tar -mx=9  
-
-    - name: Generate timestamp for artifact name
+    - name: Compress with 7z and Generate timestamp for artifact name
       id: timestamp
-      run: echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+      run: |
+        7z a docker-images-tar.7z *.tar -mx=9
+        echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
