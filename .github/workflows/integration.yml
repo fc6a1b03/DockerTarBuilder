@@ -26,15 +26,14 @@ jobs:
         arch="${{ github.event.inputs.architecture }}"
         IFS=',' read -r -a image_array <<< "$images"
         for image in "${image_array[@]}"; do
-          (docker pull "${image}" --platform "linux/${arch}" && docker save "${image}" -o "${image//[:\/]/_}-${arch}.tar") &
+          (docker pull "${image}" --platform "linux/${arch}" && \
+          docker save "${image}" | 7z a -mx=9 -mmt=on -ms=on -md=256m "${image//[:\/]/_}-${arch}.tar.7z") &
         done
         wait
 
-    - name: Compress with 7z and Generate timestamp for artifact name
+    - name: Generate timestamp for artifact name
       id: timestamp
-      run: |
-        7z a docker-images-tar.7z *.tar -mx=9 -mmt=on -ms=on -md=256m
-        echo "timestamp=$(TZ="Asia/Shanghai" printf "%(%Y%m%d%H%M%S)T")" >> $GITHUB_ENV
+      run: echo "timestamp=$(TZ="Asia/Shanghai" printf "%(%Y%m%d%H%M%S)T")" >> $GITHUB_ENV
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
