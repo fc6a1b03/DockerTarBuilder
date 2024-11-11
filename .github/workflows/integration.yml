@@ -12,39 +12,47 @@ on:
         default: 'amd64'
 
 jobs:
-  pull_and_package:
+  init:
     runs-on: ubuntu-latest
-
     steps:
-    
-    # - name: Checkout repository
-    #   uses: actions/checkout@v4
+      - name: Set up docker images array and architecture
+        id: setup
+        run: |
+          images="${{ github.event.inputs.docker_images }}"
+          architecture="${{ github.event.inputs.architecture }}"
+          json_images=$(echo "[\"$(echo $images | sed 's/,/","/g')\"]")
+          echo "docker_images=$json_images" >> $GITHUB_ENV
+          echo "architecture=$architecture" >> $GITHUB_ENV
 
-    - name: Clean Docker
-      run: |
-        docker system prune -a -f
-        docker volume prune -f
-        docker builder prune -f
-        docker network prune -f
+  pull_and_pack:
+    runs-on: ubuntu-latest
+    needs: init
+    strategy:
+      matrix:
+        image: ${{ fromJson(env.docker_images) }}
+        arch: ${{ env.architecture }}
+    steps:
+      - name: Clean Docker
+        run: |
+          docker system prune -a -f
+          docker volume prune -f
+          docker builder prune -f
+          docker network prune -f
 
-    - name: Pull Docker Images and Pack
-      run: |
-        images="${{ github.event.inputs.docker_images }}"
-        arch="${{ github.event.inputs.architecture }}"
-        IFS=',' read -r -a image_array <<< "$images"
-        for image in "${image_array[@]}"; do
-          docker pull "${image}" --platform "linux/${arch}"
-          docker save "${image}" -o "${image//[:\/]/_}-${arch}.tar"
-        done
+      - name: Pull and Pack Docker Images
+        run: |
+          echo "Pulling and saving Docker image: ${{ matrix.image }} with architecture ${{ matrix.arch }}"
+          docker pull "${{ matrix.image }}" --platform "linux/${{ matrix.arch }}"
+          docker save "${{ matrix.image }}" -o "${{ matrix.image//[:\/]/_ }}-${{ matrix.arch }}.tar"
 
-    - name: Generate timestamp for artifact name
-      id: timestamp
-      run: echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+      - name: Generate timestamp for artifact name
+        id: timestamp
+        run: echo "timestamp=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-images-tar-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
-        path: "*.tar"
-        retention-days: 1
-        compression-level: 9
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images-tar-${{ env.architecture }}-${{ env.timestamp }}
+          path: "*.tar"
+          retention-days: 1
+          compression-level: 9
