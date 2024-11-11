@@ -16,13 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # Step 1: Clean Docker system
-      - name: Clean Docker
-        run: |
-          docker system prune -a -f
-          docker volume prune -f
-          docker builder prune -f
-          docker network prune -f
 
       # Step 2: Convert the comma-separated docker_images input into a JSON array and set architecture
       - name: Set up docker images array and architecture
@@ -40,9 +33,17 @@ jobs:
     needs: pull_and_pack  # Ensure that the first job completes before this one starts
     strategy:
       matrix:
-        image: ${{ fromJson(env.docker_images) }}
+        image: ${{ fromJson(needs.pull_and_pack.outputs.docker_images) }}
         arch: ${{ env.architecture }}
     steps:
+      # Step 1: Clean Docker system
+      - name: Clean Docker
+        run: |
+          docker system prune -a -f
+          docker volume prune -f
+          docker builder prune -f
+          docker network prune -f
+    
       # Step 3: Pull and save Docker image for each image in the matrix
       - name: Pull and Pack Docker Images
         run: |
