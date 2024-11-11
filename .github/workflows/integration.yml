@@ -40,9 +40,7 @@ jobs:
     - name: Compress with 7z
       run: |
         sudo apt-get update && sudo apt-get install -y p7zip-full
-        for tarfile in *.tar; do
-          7z a "${tarfile}.7z" "$tarfile" -mx=9
-        done  
+        7z a docker-images-tar.7z *.tar -mx=9  
 
     - name: Generate timestamp for artifact name
       id: timestamp
@@ -52,6 +50,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: docker-images-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
-        path: "*.7z"
+        path: docker-images-tar.7z
         retention-days: 1
         compression-level: 0
