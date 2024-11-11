@@ -20,14 +20,6 @@ jobs:
     # - name: Checkout repository
     #   uses: actions/checkout@v4
 
-    - name: Clean Docker
-      run: |
-        docker system prune -a -f &
-        docker volume prune -f &
-        docker builder prune -f &
-        docker network prune -f &
-        wait
-
     - name: Pull Docker Images and Pack
       run: |
         images="${{ github.event.inputs.docker_images }}"
@@ -41,7 +33,7 @@ jobs:
     - name: Compress with 7z and Generate timestamp for artifact name
       id: timestamp
       run: |
-        7z a docker-images-tar.7z *.tar -mx=9 -mmt=on -ms=on -md=256m -m0=PPMd
+        7z a docker-images-tar.7z *.tar -mx=9 -mmt=on -ms=on -md=256m
         echo "timestamp=$(TZ="Asia/Shanghai" printf "%(%Y%m%d%H%M%S)T")" >> $GITHUB_ENV
     
     - name: Upload artifact
