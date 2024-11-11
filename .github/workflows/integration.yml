@@ -21,17 +21,22 @@ jobs:
     #   uses: actions/checkout@v4
 
     - name: Pull Docker Images and Pack
+      env:
+        arch: ${{ github.event.inputs.architecture }}
+        images: ${{ github.event.inputs.docker_images }}
       run: |
-        arch="${{ github.event.inputs.architecture }}"
-        images="${{ github.event.inputs.docker_images }}"
         IFS=',' read -r -a image_array <<< "$images"
-        for image in "${image_array[@]}"; do
-          (
-            docker pull "${image}" --platform "linux/${arch}" --quiet --disable-content-trust && \
-            docker save "${image}" -o "${image//[:\/]/-}-${arch}.tar"
-          ) &
-        done
-        wait
+        printf "%s\n" "${image_array[@]}" | xargs -n 1 -P $(nproc) -I {} bash -c '
+          docker pull "{}" --platform "linux/${arch}" --quiet --disable-content-trust && \
+          docker save "{}" -o "${{}//[:\/]/-}-${arch}.tar"
+        '
+        # for image in "${image_array[@]}"; do
+        #   (
+        #     docker pull "${image}" --platform "linux/${arch}" --quiet --disable-content-trust && \
+        #     docker save "${image}" -o "${image//[:\/]/-}-${arch}.tar"
+        #   ) &
+        # done
+        # wait
 
     - name: Generate timestamp for artifact name
       id: timestamp
