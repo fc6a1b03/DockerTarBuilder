@@ -41,5 +41,5 @@ jobs:
           name: docker-images-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
           path: "*.tar"
           retention-days: 1
-          compression-level: 0
+          compression-level: 9
           if-no-files-found: error
