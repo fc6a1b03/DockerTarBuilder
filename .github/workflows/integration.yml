@@ -45,6 +45,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: docker-images-tar-${{ github.event.inputs.architecture }}-${{ env.timestamp }}
-        path: "docker-images-tar-*.tar"
+        path: "*.tar"
         retention-days: 1
         compression-level: 9
