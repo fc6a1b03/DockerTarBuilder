@@ -27,8 +27,8 @@ jobs:
         IFS=',' read -r -a image_array <<< "$images"
         for image in "${image_array[@]}"; do
           (
-            docker pull "${image}" --platform "linux/${arch}" --quiet && \
-            docker save "${image}" -o "${image//[:\/]/-}-${arch}.tar"
+            docker pull "${image}" --platform "linux/${arch}" --quiet --disable-content-trust && \
+            docker save "${image}" --quiet --output "${image//[:\/]/-}-${arch}.tar"
           ) &
         done
         wait
